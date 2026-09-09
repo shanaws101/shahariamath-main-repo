@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
       // Demo mode removed to use real SMS directly.
 
       // Send OTP via MIM SMS — Web OTP API format for auto-fill
-      const smsMessage = `Your Shaharia Math verification code is: ${otp}. Valid for 5 minutes.\n\n@shahariamath.com #${otp}`;
+      const smsMessage = `Your Shaharia Math OTP is: ${otp}. Valid for 5 minutes.\n\n@shahariamath.com #${otp}`;
       const sent = await sendSmsMimSms(normalizedPhone, smsMessage);
 
       if (!sent) {
