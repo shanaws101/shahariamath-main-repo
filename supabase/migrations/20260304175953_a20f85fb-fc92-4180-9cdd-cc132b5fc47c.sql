@@ -1,0 +1,1 @@
+ALTER TABLE public.cms_content ADD CONSTRAINT cms_content_section_unique UNIQUE (section);

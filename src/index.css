@@ -1,0 +1,329 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Shaharia Math Design System
+   Brand: Warm Orange (#F97316) & Electric Blue Accent (#3B82F6)
+   Modern, Energetic, Premium Academy Aesthetic
+*/
+
+@layer base {
+  :root {
+    /* Brand Primary (Orange Palette) */
+    --color-primary-50: #FFF7ED;
+    --color-primary-100: #FFEDD5;
+    --color-primary-200: #FED7AA;
+    --color-primary-300: #FDBA74;
+    --color-primary-400: #FB923C;
+    --color-primary-500: #F97316;
+    --color-primary-600: #EA580C;
+    --color-primary-700: #C2410C;
+    --color-primary-800: #9A3412;
+    --color-primary-900: #7C2D12;
+
+    /* Secondary (Blue Accent) */
+    --color-secondary-500: #3B82F6;
+
+    /* Background & Surface */
+    --color-background: #FFFCF9;
+    --color-surface: #FFF7ED;
+    --color-text-primary: #292524;
+
+    /* Primary - Vibrant Brand Orange (#F97316) */
+    --primary: 25 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Electric Blue Accent (#3B82F6) */
+    --secondary: 217 91% 60%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Accent - Warm Gold (for CTAs & highlights) */
+    --accent-gold: 38 92% 50%;
+    
+    /* Background & Surfaces */
+    --background: 30 100% 99%;
+    --foreground: 20 6% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 20 6% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 6% 15%;
+    
+    /* Muted & Accent */
+    --muted: 33 100% 96%;
+    --muted-foreground: 24 10% 45%;
+    
+    --accent: 34 100% 92%;
+    --accent-foreground: 20 6% 15%;
+    
+    /* Semantic Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --whatsapp: 142 70% 49%;
+    --whatsapp-foreground: 0 0% 100%;
+    
+    /* UI Elements */
+    --border: 30 20% 90%;
+    --input: 30 20% 90%;
+    --ring: 25 95% 53%;
+    
+    --radius: 0.75rem;
+    
+    /* Brand Gradients */
+    --gradient-brand: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(21 90% 48%) 50%, hsl(17 88% 40%) 100%);
+    --gradient-brand-light: linear-gradient(135deg, hsl(27 96% 61%) 0%, hsl(25 95% 53%) 100%);
+    --gradient-brand-subtle: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+    --gradient-hero: linear-gradient(180deg, #FFFCF9 0%, #FFF7ED 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, #FFFDFB 100%);
+    --gradient-dark: linear-gradient(135deg, hsl(20 15% 10%) 0%, hsl(20 10% 14%) 100%);
+    --gradient-energetic: linear-gradient(135deg, #F97316 0%, #3B82F6 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(20 6% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(20 6% 15% / 0.08), 0 2px 4px -2px hsl(20 6% 15% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(20 6% 15% / 0.08), 0 4px 6px -4px hsl(20 6% 15% / 0.06);
+    --shadow-xl: 0 20px 25px -5px hsl(20 6% 15% / 0.08), 0 8px 10px -6px hsl(20 6% 15% / 0.06);
+    --shadow-glow: 0 0 25px -5px hsl(25 95% 53% / 0.35);
+    --shadow-brand: 0 4px 14px -3px hsl(25 95% 53% / 0.4);
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 33 100% 96%;
+    --sidebar-accent-foreground: 20 6% 15%;
+    --sidebar-border: 30 20% 92%;
+    --sidebar-ring: 25 95% 53%;
+  }
+
+  .dark {
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 217 85% 65%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --background: 20 14% 6%;
+    --foreground: 30 20% 96%;
+    
+    --card: 20 12% 9%;
+    --card-foreground: 30 20% 96%;
+    
+    --popover: 20 12% 9%;
+    --popover-foreground: 30 20% 96%;
+    
+    --muted: 20 10% 14%;
+    --muted-foreground: 25 10% 60%;
+    
+    --accent: 20 12% 16%;
+    --accent-foreground: 30 20% 96%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 30 20% 96%;
+    
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    --whatsapp: 142 70% 49%;
+    --whatsapp-foreground: 0 0% 100%;
+    
+    --border: 20 10% 18%;
+    --input: 20 10% 18%;
+    --ring: 25 95% 55%;
+    
+    --gradient-brand: linear-gradient(135deg, hsl(25 90% 50%) 0%, hsl(20 85% 42%) 50%, hsl(15 75% 32%) 100%);
+    --gradient-brand-light: linear-gradient(135deg, hsl(27 92% 55%) 0%, hsl(25 90% 48%) 100%);
+    --gradient-brand-subtle: linear-gradient(135deg, hsl(20 15% 10%) 0%, hsl(20 12% 13%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(20 14% 6%) 0%, hsl(20 12% 9%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(20 12% 9%) 0%, hsl(20 12% 12%) 100%);
+    
+    --sidebar-background: 20 14% 6%;
+    --sidebar-foreground: 30 20% 96%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 10% 14%;
+    --sidebar-accent-foreground: 30 20% 96%;
+    --sidebar-border: 20 10% 18%;
+    --sidebar-ring: 25 95% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  ::selection {
+    @apply bg-primary/20 text-primary;
+  }
+}
+
+@layer utilities {
+  /* Text gradient utility */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-brand);
+  }
+  
+  .text-gradient-energetic {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-energetic);
+  }
+  
+  /* Brand gradient button */
+  .btn-brand {
+    background-image: var(--gradient-brand);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-brand);
+  }
+  
+  .btn-brand:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px -3px hsl(25 95% 53% / 0.5);
+    transform: translateY(-1px);
+  }
+  
+  /* Gold accent button */
+  .btn-gold {
+    background: hsl(38 92% 50%);
+    color: hsl(20 6% 15%);
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px -3px hsl(38 92% 50% / 0.4);
+  }
+  
+  .btn-gold:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px -3px hsl(38 92% 50% / 0.5);
+    transform: translateY(-1px);
+  }
+  
+  /* Card with glow effect */
+  .card-glow {
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  
+  .card-glow:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+  
+  /* Gradient backgrounds */
+  .bg-gradient-brand {
+    background-image: var(--gradient-brand);
+  }
+  
+  .bg-gradient-brand-light {
+    background-image: var(--gradient-brand-light);
+  }
+  
+  .bg-gradient-brand-subtle {
+    background-image: var(--gradient-brand-subtle);
+  }
+  
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+  }
+  
+  .bg-gradient-primary {
+    background-image: var(--gradient-brand);
+  }
+  
+  .bg-gradient-energetic {
+    background-image: var(--gradient-energetic);
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 1; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Bangla font support */
+  .font-bangla {
+    font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  }
+
+  /* Hide scrollbar for horizontal scrollable areas */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Infinite marquee animations */
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+  .animate-marquee-left {
+    animation: marquee-left var(--marquee-speed, 30s) linear infinite;
+  }
+  .animate-marquee-right {
+    animation: marquee-right var(--marquee-speed, 30s) linear infinite;
+  }
+}

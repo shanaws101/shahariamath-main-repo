@@ -1,0 +1,15 @@
+{
+  "name": "Shaharia Math",
+  "short_name": "Shaharia Math",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#F97316",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

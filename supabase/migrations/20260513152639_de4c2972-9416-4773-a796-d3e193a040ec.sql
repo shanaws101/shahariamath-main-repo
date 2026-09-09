@@ -1,0 +1,1 @@
+DELETE FROM subjects WHERE id = '359fef53-b3cf-4a53-83f2-2d59d548eb07';
