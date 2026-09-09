@@ -25,8 +25,7 @@ USING (
   )
 );
 
--- 2. Add RLS to realtime.messages so users can only subscribe to channels they should access
-ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY;
+-- 2. RLS on realtime.messages is enabled by default by Supabase
 
 -- Allow authenticated users to subscribe to any channel topic ONLY if they pass
 -- additional enrollment checks at the application layer.
