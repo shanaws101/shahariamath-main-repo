@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Phone, User, Check, GraduationCap, Tag, Loader2, Copy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Phone, User, Check, GraduationCap, Tag, Loader2, Copy, Lock, Eye, EyeOff, ShieldAlert } from "lucide-react";
 import { AuthMobileHero } from "@/components/auth/AuthMobileHero";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useReferral } from "@/hooks/useReferral";
 import { courseTypeHasYears } from "@/lib/course-types";
+import { generateDeviceFingerprint, getDeviceLabel } from "@/lib/deviceFingerprint";
 
 const departments = [
   { value: 'management', label: 'Management', label_bn: 'ম্যানেজমেন্ট' },
@@ -61,12 +62,17 @@ export default function JoinPage() {
     name: '',
     phone: '',
     email: inviteEmail,
+    password: '',
+    confirmPassword: '',
     otp: '',
     department: '',
     year: '',
     courseType: '',
     session: '',
   });
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [blockedInfo, setBlockedInfo] = useState<{ activeDevice: string; message: string } | null>(null);
   
   const [userId, setUserId] = useState<string | null>(null);
   const [resumeChecked, setResumeChecked] = useState(false);
@@ -206,12 +212,51 @@ export default function JoinPage() {
       toast({ title: "Invalid phone", description: "Please enter a valid phone number.", variant: "destructive" });
       return;
     }
+    if (!formData.password || formData.password.length < 6) {
+      toast({ title: "Password too short", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      toast({ title: "Passwords do not match", description: "Please make sure both passwords match.", variant: "destructive" });
+      return;
+    }
+
     setIsLoading(true);
+    setBlockedInfo(null);
 
     try {
-      const { data, ok } = await callOtpFunction({ phone: formData.phone, action: "send" });
+      const fp = generateDeviceFingerprint();
+
+      // Check device guard before triggering SMS
+      const { data: check, error: checkErr } = await supabase.rpc('check_student_device', {
+        p_phone: formData.phone,
+        p_device_fp: fp,
+      });
+
+      if (!checkErr && check?.device_status === 'blocked') {
+        setBlockedInfo({
+          activeDevice: check.active_device || 'another device',
+          message: check.message || 'Device not authorized.',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, ok } = await callOtpFunction({
+        phone: formData.phone,
+        action: "send",
+        device_fingerprint: fp,
+      });
+
       if (!ok) {
-        toast({ title: "Error", description: data.error || "Failed to send OTP", variant: "destructive" });
+        if (data?.device_blocked) {
+          setBlockedInfo({
+            activeDevice: data.active_device || 'another device',
+            message: data.error || 'Device not authorized.',
+          });
+        } else {
+          toast({ title: "Error", description: data.error || "Failed to send OTP", variant: "destructive" });
+        }
       } else {
         setStep('otp');
         setCountdown(60);
@@ -253,13 +298,13 @@ export default function JoinPage() {
         return;
       }
 
-      // Phone verified, now create the actual account
+      // Phone verified, now create the actual account with chosen password
       setPhoneVerified(true);
       
       const mockEmail = `s${formData.phone.replace(/\D/g, '')}@shahariamath.com`;
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: mockEmail,
-        password: formData.phone,
+        password: formData.password,
         options: {
           data: {
             full_name: formData.name,
@@ -270,14 +315,14 @@ export default function JoinPage() {
 
       if (signUpError) {
         if (signUpError.message.includes('already registered')) {
-          // Try signing in with existing credentials to resume
+          // Try signing in with credentials to resume
           const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email: mockEmail,
-            password: formData.phone,
+            password: formData.password,
           });
 
           if (signInError) {
-            toast({ title: "Account exists", description: "This email is already registered. Please login.", variant: "destructive" });
+            toast({ title: "Account exists", description: "This account is already registered. Please login.", variant: "destructive" });
             setTimeout(() => navigate('/login'), 1500);
             setIsLoading(false);
             return;
@@ -379,9 +424,25 @@ export default function JoinPage() {
           year: formData.year ? parseInt(formData.year) : null,
           session: formData.session || null,
           course_type: formData.courseType || null,
+          has_password: true,
         } as any, { onConflict: 'user_id' });
 
       if (profileError) throw profileError;
+
+      // Auto-register current device in trusted_devices
+      try {
+        const fp = generateDeviceFingerprint();
+        const label = getDeviceLabel();
+        await supabase.from('trusted_devices').upsert({
+          user_id: user.id,
+          device_fingerprint: fp,
+          device_label: label,
+          last_used_at: new Date().toISOString(),
+          is_revoked: false,
+        }, { onConflict: 'user_id,device_fingerprint' });
+      } catch (e) {
+        console.warn("Device registration notice:", e);
+      }
 
       // Use upsert to avoid duplicate role errors
       const { error: roleError } = await supabase
@@ -412,7 +473,12 @@ export default function JoinPage() {
   const handleResendOtp = useCallback(async () => {
     if (countdown > 0) return;
     setIsLoading(true);
-    const { data, ok } = await callOtpFunction({ phone: formData.phone, action: "send" });
+    const fp = generateDeviceFingerprint();
+    const { data, ok } = await callOtpFunction({
+      phone: formData.phone,
+      action: "send",
+      device_fingerprint: fp,
+    });
     if (ok) {
       toast({ title: "OTP resent", description: "Check your phone." });
       setFormData(prev => ({ ...prev, otp: '' }));
@@ -552,6 +618,59 @@ export default function JoinPage() {
                   </div>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="password">{isEnglish ? "Password" : "পাসওয়ার্ড"}</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={isEnglish ? "Create password (min 6 chars)" : "পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর)"}
+                      value={formData.password}
+                      onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                      className="pl-10 pr-10"
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">{isEnglish ? "Confirm Password" : "পাসওয়ার্ড নিশ্চিত করুন"}</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={isEnglish ? "Confirm your password" : "আবার পাসওয়ার্ড লিখুন"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="pl-10"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                {blockedInfo && (
+                  <div className="p-3.5 rounded-xl border border-destructive/30 bg-destructive/10 space-y-1">
+                    <div className="flex items-center gap-2 text-destructive font-semibold text-xs">
+                      <ShieldAlert className="h-4 w-4 shrink-0" />
+                      <span>{isEnglish ? "Device Not Authorized" : "ডিভাইস অনুমোদিত নয়"}</span>
+                    </div>
+                    <p className="text-xs text-foreground/80">
+                      {blockedInfo.message}
+                    </p>
+                  </div>
+                )}
+
                 {legacyStudent && (
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
                     <Check className="h-4 w-4 text-blue-600" />
@@ -564,7 +683,7 @@ export default function JoinPage() {
                   </div>
                 )}
 
-                <Button type="submit" className="btn-brand w-full h-14 rounded-2xl text-base font-bold gap-2" disabled={isLoading}>
+                <Button type="submit" className="btn-brand w-full h-14 rounded-2xl text-base font-bold gap-2" disabled={isLoading || Boolean(blockedInfo)}>
                   {isLoading ? <><Loader2 className="h-4 w-4 animate-spin" />{t('common.loading')}</> : <>{t('auth.continue')}<ArrowRight className="h-4 w-4" /></>}
                 </Button>
 

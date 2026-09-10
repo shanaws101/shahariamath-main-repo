@@ -142,6 +142,21 @@ Deno.serve(async (req) => {
 
     // ─── SEND OTP ───
     if (action === "send") {
+      const deviceFp = body.device_fingerprint;
+      if (deviceFp) {
+        const { data: devCheck, error: devCheckErr } = await supabaseAdmin.rpc("check_student_device", {
+          p_phone: normalizedPhone,
+          p_device_fp: deviceFp,
+        });
+        if (!devCheckErr && devCheck && devCheck.device_status === "blocked") {
+          console.warn(`${PROJECT_TAG} Pre-OTP device check BLOCKED for ${normalizedPhone} on device ${deviceFp}`);
+          return json({
+            error: devCheck.message || "This device is not authorized for this account.",
+            device_blocked: true,
+            active_device: devCheck.active_device,
+          }, 403);
+        }
+      }
       if (isRateLimited(`send:${normalizedPhone}`, RATE_LIMIT_MAX_SEND) || isRateLimited(`send:ip:${clientIP}`, RATE_LIMIT_MAX_SEND)) {
         return json({ error: "Too many OTP requests. Please wait a minute." }, 429);
       }

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Search, Eye, Ban, RefreshCw, ArrowUpCircle, Trash2,
-  MoreHorizontal, UserPlus, FileSpreadsheet,
+  MoreHorizontal, UserPlus, FileSpreadsheet, Smartphone,
 } from "lucide-react";
 import { LegacyStudentUpload } from "@/components/admin/LegacyStudentUpload";
 import { supabase } from "@/integrations/supabase/client";
@@ -182,6 +182,33 @@ export function StudentsPageContent() {
         description: `${student.full_name} has been ${student.is_blocked ? 'unblocked' : 'blocked'}.`,
       });
       fetchStudents();
+    }
+  };
+
+  const handleResetDevice = async (student: Student) => {
+    try {
+      const { error } = await supabase
+        .from('trusted_devices')
+        .update({ is_revoked: true })
+        .eq('user_id', student.user_id);
+
+      if (error) throw error;
+
+      await supabase
+        .from('user_sessions')
+        .update({ is_active: false })
+        .eq('user_id', student.user_id);
+
+      toast({
+        title: "Device Reset",
+        description: `Device access for ${student.full_name} has been reset. They can now log in on their new device.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to reset student device",
+        variant: "destructive",
+      });
     }
   };
 
@@ -631,6 +658,9 @@ export function StudentsPageContent() {
                                 <Ban className="h-4 w-4 mr-2" />
                                 {student.is_blocked ? 'Unblock' : 'Block'}
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleResetDevice(student)}>
+                                <Smartphone className="h-4 w-4 mr-2" /> Reset Device
+                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDeleteStudent(student)}
                                 className="text-destructive"
@@ -696,6 +726,16 @@ export function StudentsPageContent() {
                       <Badge variant="secondary">Active</Badge>
                     )}
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-xl border bg-muted/20">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-semibold">Single Device Lock</p>
+                    <p className="text-[11px] text-muted-foreground">Reset if the student changed phones or lost access</p>
+                  </div>
+                  <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => handleResetDevice(selectedStudent)}>
+                    <Smartphone className="h-3.5 w-3.5" /> Reset Device
+                  </Button>
                 </div>
 
                 {/* Onboarding Information */}
